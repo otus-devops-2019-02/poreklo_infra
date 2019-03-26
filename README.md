@@ -2,6 +2,23 @@
 
 > Здесь будет моя великая инфраструктура
 
+## Сборка образов VM при помощи Packer
+
+* установлен `packer`
+* созданы шаблоны:
+  * `ubuntu16.json` - образ с установленными redis и ruby (reddit-base)
+  * `immutable.json` - образ с развернутым приложением (reddit-full)
+
+Прилагаю команду для запуска приложения из созданного образа `reddit-full`:
+
+```shell
+gcloud compute instances create reddit \
+    --image-family reddit-full \
+    --tags puma-server \
+    --restart-on-failure \
+    --machine-type=g1-small
+```
+
 ## cloud-testapp
 
 Команда создания инстанса

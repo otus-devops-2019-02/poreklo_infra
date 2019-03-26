@@ -1,0 +1,59 @@
+{
+    "builders": [
+        {
+            "image_description": "monolith puma service",
+            "type": "googlecompute",
+            "project_id": "{{ user `project_id` }}",
+            "image_name": "{{ user `image_name` }}",
+            "image_family": "reddit-full",
+            "source_image_family": "{{ user `source_image_family` }}",
+            "zone": "europe-west1-b",
+            "ssh_username": "appuser",
+            "machine_type": "{{ user `machine_type` }}",
+            "disk_size": "{{ user `disk_size` }}",
+            "disk_type": "{{ user `disk_type` }}",
+            "labels": {
+                "custom-label": "true"
+            },
+            "tags": [
+                "puma-server"
+            ],
+            "image_labels": {
+                "image-label-1": "ok"
+            },
+            "instance_name": "puma-{{uuid}}",
+            "network": "default"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "file",
+            "source": "files/puma.service",
+            "destination": "puma.service"
+        },
+        {
+            "type": "shell",
+            "scripts": [
+                "scripts/install_ruby.sh",
+                "scripts/install_mongodb.sh"
+            ],
+            "execute_command": "sudo {{.Path}}"
+        },
+        {
+            "type": "shell",
+            "inline": [
+                "sudo mv ./puma.service /etc/systemd/system/puma.service",
+                "git clone -b monolith https://github.com/express42/reddit.git",
+                "cd reddit && bundle install",
+                "sudo systemctl daemon-reload",
+                "sudo systemctl enable puma.service"
+            ]
+        }
+    ],
+    "variables": {
+        "image_name": "reddit-base-{{timestamp}}",
+        "machine_type": "f1-micro",
+        "disk_size": "11",
+        "disk_type": "pd-standard"
+    }
+}

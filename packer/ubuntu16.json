@@ -2,13 +2,13 @@
     "builders": [
         {
             "type": "googlecompute",
-            "project_id": "infra-235008",
-            "image_name": "reddit-base-{{timestamp}}",
+            "project_id": "{{ user `project_id` }}",
+            "image_name": "{{ user `image_name` }}",
             "image_family": "reddit-base",
-            "source_image_family": "ubuntu-1604-lts",
+            "source_image_family": "{{ user `source_image_family` }}",
             "zone": "europe-west1-b",
             "ssh_username": "appuser",
-            "machine_type": "f1-micro"
+            "machine_type": "{{ user `machine_type` }}"
         }
     ],
     "provisioners": [
@@ -22,5 +22,9 @@
             "script": "scripts/install_mongodb.sh",
             "execute_command": "sudo {{.Path}}"
         }
-    ]
+    ],
+    "variables": {
+        "image_name": "reddit-base-{{timestamp}}",
+        "machine_type": "f1-micro"
+    }
 }
